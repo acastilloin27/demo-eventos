@@ -1,5 +1,5 @@
 import { createApp } from './app.mjs'
-import { openDatabase } from './database.mjs'
+import { openStorage } from './storage.mjs'
 
 const production = process.env.NODE_ENV === 'production'
 const port = Number(process.env.PORT || 3001)
@@ -11,11 +11,11 @@ const origins = production ? [new URL(process.env.APP_ORIGIN).origin] : [...new 
   'http://localhost:5173', 'http://127.0.0.1:5173', `http://localhost:${port}`, `http://127.0.0.1:${port}`,
   ...(process.env.APP_ORIGIN ? [new URL(process.env.APP_ORIGIN).origin] : []),
 ])]
-const db = openDatabase()
-const app = await createApp({ db, production, origins, trustProxyHops })
+const store = await openStorage()
+const app = await createApp({ store, production, origins, trustProxyHops })
 const server = app.listen(port, process.env.HOST || '127.0.0.1', () => console.log(`Travesía API: http://${process.env.HOST || '127.0.0.1'}:${port}`))
-server.on('error', (error) => { console.error('No se pudo iniciar el servidor:', error.code); db.close(); process.exitCode = 1 })
+server.on('error', (error) => { console.error('No se pudo iniciar el servidor:', error.code); store.close(); process.exitCode = 1 })
 for (const signal of ['SIGINT', 'SIGTERM']) process.on(signal, () => {
-  server.close(() => { db.close(); process.exit(0) })
+  server.close(() => { store.close(); process.exit(0) })
   setTimeout(() => process.exit(1), 10_000).unref()
 })

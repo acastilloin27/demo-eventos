@@ -1,6 +1,8 @@
 # Travesía · Centro de eventos
 
-Sitio React con API Express y base de datos SQLite persistente. Incluye solicitudes de cotización y panel de administración en `/admin`.
+Sitio React con API Express y almacenamiento en SQLite local o PostgreSQL de Supabase. Incluye solicitudes de cotización y panel de administración en `/admin`.
+
+Para el dominio **demo-eventos-liard.vercel.app**, sigue la [guía de Supabase y Vercel](docs/supabase-vercel.md). Incluye el SQL, las variables del servidor, la creación del administrador y el despliegue.
 
 ## Ejecutar localmente
 
@@ -44,7 +46,9 @@ Las pruebas usan bases aisladas y verifican persistencia, validaciones, autentic
 
 ## Producción
 
-Este repositorio requiere un servidor Node con disco persistente. No basta con publicar `dist` como sitio estático. `npm start` sirve el frontend compilado y la API desde el mismo origen.
+En **Vercel**, usa Supabase y la configuración incluida en `vercel.json`, como indica la [guía](docs/supabase-vercel.md). La función `api/index.mjs` sirve la API; Vercel sirve el frontend. No se utiliza SQLite en Vercel.
+
+Para **un servidor Node con SQLite**, necesitas disco persistente. No basta con publicar `dist` como sitio estático. `npm start` sirve el frontend compilado y la API desde el mismo origen.
 
 1. Instala con `npm ci` y compila con `npm run build`.
 2. Configura `.env`: `NODE_ENV=production`, `APP_ORIGIN=https://tu-dominio.cl`, `DATABASE_PATH` en un disco persistente y `HOST`/`PORT` según el hosting.
@@ -52,7 +56,7 @@ Este repositorio requiere un servidor Node con disco persistente. No basta con p
 4. Configura HTTPS en el proxy o plataforma. Las cookies de producción requieren HTTPS. Si usas proxy, configura `TRUST_PROXY_HOPS` con el número exacto de saltos de confianza para identificar correctamente los clientes.
 5. Ejecuta una sola instancia con esta configuración SQLite. Conserva copias de seguridad con la API de backup de SQLite o un snapshot consistente del volumen; el archivo puede tener datos pendientes en `-wal` mientras el servicio está activo. No borres `data/` al desplegar.
 
-Los límites de solicitudes se mantienen en memoria y se reinician con el proceso. Para varias instancias se necesita una base compartida y un almacén compartido para esos límites. Las fotografías y fuentes dependen de Unsplash y Google Fonts, como en el diseño original.
+En modo SQLite, los límites de solicitudes se mantienen en memoria y se reinician con el proceso. En modo Supabase, datos, sesiones y contadores se comparten en PostgreSQL entre las instancias de la API. Las fotografías y fuentes dependen de Unsplash y Google Fonts, como en el diseño original.
 
 ## API
 

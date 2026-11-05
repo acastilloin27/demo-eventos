@@ -1,6 +1,7 @@
 import { randomBytes, scrypt as scryptCallback, timingSafeEqual, createHash, randomUUID } from 'node:crypto'
 import { promisify } from 'node:util'
 import { z } from 'zod'
+import { sqliteStore } from './sqlite-store.mjs'
 
 const scrypt = promisify(scryptCallback)
 export const credentialsSchema = z.object({
@@ -24,25 +25,10 @@ export async function verifyPassword(password, encoded) {
 export const tokenHash = (token) => createHash('sha256').update(token).digest('hex')
 export const newToken = () => randomBytes(32).toString('hex')
 
-export async function createAdmin(db, input) {
+export async function createAdmin(storage, input) {
+  const store = storage.prepare ? sqliteStore(storage) : storage
   const credentials = credentialsSchema.parse(input)
   const id = randomUUID()
   const passwordHash = await hashPassword(credentials.password)
-  // Running the command again rotates the password and revokes existing sessions.
-  db.exec('BEGIN IMMEDIATE')
-  try {
-    const existing = db.prepare('SELECT id FROM admins WHERE email = ?').get(credentials.email)
-    if (existing) {
-      db.prepare('UPDATE admins SET password_hash = ? WHERE id = ?').run(passwordHash, existing.id)
-      db.prepare('DELETE FROM sessions WHERE admin_id = ?').run(existing.id)
-    } else {
-      db.prepare('INSERT INTO admins (id, email, password_hash, created_at) VALUES (?, ?, ?, ?)')
-        .run(id, credentials.email, passwordHash, new Date().toISOString())
-    }
-    db.exec('COMMIT')
-    return { id: existing?.id || id, email: credentials.email }
-  } catch (error) {
-    db.exec('ROLLBACK')
-    throw error
-  }
+  return store.saveAdmin({ id, email: credentials.email, passwordHash, now: new Date().toISOString() })
 }

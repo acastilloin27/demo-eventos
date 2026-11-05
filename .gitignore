@@ -1,6 +1,8 @@
 node_modules/
 .npm-cache/
 .vercel/
+supabase/.temp/
+supabase/.branches/
 dist/
 .env
 .env.*
@@ -10,3 +12,6 @@ data/
 *.sqlite-shm
 *.sqlite-wal
 *.log
+
+.vercel
+.env*

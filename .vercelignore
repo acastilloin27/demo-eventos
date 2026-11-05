@@ -1,0 +1,14 @@
+.git
+node_modules
+.npm-cache
+.vercel
+.env
+.env.*
+data
+dist
+supabase/.temp
+supabase/.branches
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal
+*.log

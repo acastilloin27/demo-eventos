@@ -1,0 +1,37 @@
+{
+  "name": "travesia-eventos",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=24.14.0 <25"
+  },
+  "scripts": {
+    "dev": "concurrently -k -n api,web \"npm:dev:api\" \"npm:dev:web\"",
+    "dev:api": "node --env-file-if-exists=.env --watch server/index.mjs",
+    "dev:web": "vite",
+    "build": "tsc --noEmit && vite build",
+    "start": "node --env-file-if-exists=.env server/index.mjs",
+    "admin:create": "node --env-file-if-exists=.env server/create-admin.mjs",
+    "test": "node --test server/tests/*.test.mjs"
+  },
+  "dependencies": {
+    "express": "^5.3.0",
+    "express-rate-limit": "^8.7.3",
+    "helmet": "^8.3.0",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.3.4",
+    "@types/node": "^26.6.6",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^6.2.1",
+    "concurrently": "^10.0.6",
+    "tailwindcss": "^4.3.4",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.5"
+  }
+}
